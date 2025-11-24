@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clipchamp Launcher</title>
+  <style>
+    body {
+      background: #0a0f1c;
+      color: #e5eaf2;
+      font-family: Inter, Segoe UI, Arial;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      background: rgba(255,255,255,0.05);
+      padding: 32px;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    }
+    h1 {
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-size: 22px;
+    }
+    p {
+      color: #9aa6b8;
+      margin-bottom: 24px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 14px;
+      color: #062b3a;
+      background: linear-gradient(90deg,#06b6d4,#3acbf5);
+    }
+    .btn:active {
+      transform: translateY(1px);
+    }
+    .note {
+      font-size: 13px;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Open Clipchamp</h1>
+    <p>You can launch Clipchamp either through the installed Windows app or through the web version.</p>
+
+    <!-- Button 1: Open Clipchamp Web -->
+    <button id="openWeb" class="btn">
+      Open Clipchamp (Web)
+    </button>
+
+    <!-- Button 2: Open Clipchamp Installed App -->
+    <button id="openApp" class="btn">
+      Open Clipchamp (App)
+    </button>
+
+    <div class="note">
+      For the app button to work, Clipchamp must be installed and registered on Windows with the <code>ms-clipchamp:</code> protocol.
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('openWeb').addEventListener('click', () => {
+      window.open('https://app.clipchamp.com/consumer/', '_blank');
+    });
+
+    document.getElementById('openApp').addEventListener('click', () => {
+      // Attempts to launch Clipchamp if installed
+      window.location.href = 'ms-clipchamp:';
+    });
+  </script>
+</body>
+</html>

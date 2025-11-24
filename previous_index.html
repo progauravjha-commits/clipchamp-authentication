@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Open in Clipchamp — Glimsbyte (Sign-in target)</title>
+  <style>
+    :root{--bg:#071024;--card:#0b1220;--accent:#06b6d4;--muted:#94a3b8}
+    body{font-family:Inter,Segoe UI,system-ui,Arial;background:linear-gradient(180deg,var(--bg),#041022);color:#e6eef8;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-radius:12px;padding:28px;max-width:720px;width:100%;box-shadow:0 12px 36px rgba(2,6,23,0.6)}
+    h1{font-size:20px;margin:0 0 8px}
+    p{margin:0 0 12px;color:var(--muted)}
+    .btn{display:inline-flex;align-items:center;gap:10px;padding:12px 16px;border-radius:10px;background:linear-gradient(90deg,var(--accent),#38bdf8);color:#04293b;font-weight:600;border:0;cursor:pointer;font-size:15px}
+    .note{margin-top:14px;color:var(--muted);font-size:13px}
+    .kbd{background:#071125;padding:6px 8px;border-radius:6px;font-family:monospace;color:#9fb7c9}
+    ul{color:var(--muted);margin-top:6px}
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Open Clipchamp (attempt sign-in)</h1>
+    <p>This page will try the Clipchamp consumer app and a few likely sign-in endpoints. If the browser already has an active Microsoft/Entra session, Clipchamp should immediately pick it up.</p>
+
+    <button id="openClipchamp" class="btn" title="Open Clipchamp sign-in in new tab">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7"></path><polyline points="23 7 12 13 1 7"></polyline></svg>
+      Open Clipchamp (try sign-in)
+    </button>
+
+    <div class="note">If popup blocked: <span class="kbd">Ctrl/⌘ + Click</span> the button or allow popups for this site.</div>
+
+    <div class="note" style="margin-top:12px">Developer notes:
+      <ul>
+        <li>I attempt multiple likely sign-in targets in order. If the first opens and triggers the built-in sign-in flow, great. If not, fallbacks try other endpoints.</li>
+        <li>Because of cross-origin security we cannot programmatically click a sign-in button inside Clipchamp. We can only open the correct URL and rely on the browser session and Clipchamp's own flow.</li>
+        <li>If your org forces reauth or has conditional access, the user may still see additional Microsoft login steps.</li>
+      </ul>
+    </div>
+  </main>
+
+  <script>
+    (function(){
+      const btn = document.getElementById('openClipchamp');
+
+      // Candidate URLs to try. Order matters: the page will attempt each in sequence until a window opens.
+      const tryUrls = [
+        // Primary consumer app
+        'https://app.clipchamp.com/consumer/',
+        // Some plausible sign-in patterns (not guaranteed); included as fallbacks
+        'https://app.clipchamp.com/consumer/sign-in',
+        'https://app.clipchamp.com/consumer/signin',
+        'https://app.clipchamp.com/consumer/?login=true',
+        'https://app.clipchamp.com/auth',
+        'https://clipchamp.com/signin',
+        'https://clipchamp.com/auth'
+      ];
+
+      function openSequentially(list) {
+        // Try to open first that isn't blocked. If blocked, try fallback URLs in the same user gesture.
+        for (let i = 0; i < list.length; i++) {
+          try {
+            const url = list[i];
+            const win = window.open(url, '_blank');
+            if (win) {
+              // Successfully opened a tab. Focus it and stop.
+              try { win.focus(); } catch (e) {}
+              console.log('Opened:', url);
+              return true;
+            }
+          } catch (e) {
+            // ignore and try next
+          }
+        }
+        return false;
+      }
+
+      btn.addEventListener('click', () => {
+        const ok = openSequentially(tryUrls);
+        if (!ok) {
+          // All attempts blocked by popup blocker. Offer to navigate current tab.
+          const prompt = confirm('Popup blocked. Open Clipchamp sign-in in this tab instead?');
+          if (prompt) {
+            // Navigate to primary consumer app in current tab
+            window.location.href = tryUrls[0];
+          }
+        }
+      });
+
+      // Extra: allow Ctrl/⌘ + Click to open directly since that's a browser gesture and won't be blocked.
+
+    })();
+  </script>
+</body>
+</html>
